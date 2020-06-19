@@ -1,4 +1,4 @@
-var data = [
+var pufflesItemsData = [
 	{
 		"paper_item_id": 5475,
 		"type": 6,

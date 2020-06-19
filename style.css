@@ -1,0 +1,111 @@
+.puffles-playercard-generator {
+  align-items: center;
+  display: flex;
+}
+
+.puffles-playercard-generator.is-loading {
+  background: #e8e5e5;
+  height: 425px;
+}
+
+.puffles-playercard-generator.is-loading * {
+  display: none;
+}
+
+.puffles-playercard-generator-loading-placeholder {
+  display: none;
+}
+
+.puffles-playercard-generator.is-loading
+  .puffles-playercard-generator-loading-placeholder {
+  animation: pufflesLoadingAnimation infinite 8s;
+  background: #b3acac;
+  display: block;
+  margin: auto;
+  padding: 12px;
+  height: 36px;
+  width: 36px;
+}
+
+@keyframes pufflesLoadingAnimation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.puffles-playercard-generator-wrapper {
+  margin-right: 12px;
+}
+
+.puffles-playercard-item-search-result {
+  font-size: 12px;
+  margin: 8px 0;
+}
+
+.puffles-playercard-item-search-error {
+  background: #d63638;
+  color: white;
+  padding: 4px;
+  display: none;
+}
+
+.puffles-playercard-canvas {
+  margin-right: 12px;
+  width: 320px;
+}
+
+.puffles-playercard-generator-download-button-wrapper {
+  float: right;
+  margin-top: 24px;
+}
+
+.puffles-playercard-random {
+  cursor: pointer;
+}
+
+.puffles-playercard-generator-items select {
+  width: calc((100% - 24px) / 2);
+}
+
+.puffles-playercard-generator-items select option {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media only screen and (max-width: 768px) {
+  .puffles-playercard-generator {
+    flex-direction: column;
+  }
+
+  .puffles-playercard-generator-wrapper {
+    margin: auto;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .puffles-playercard-canvas {
+    display: block;
+    margin: auto;
+    width: 320px;
+  }
+
+  .puffles-playercard-generator-download-button-wrapper {
+    padding: 8px;
+  }
+
+  .puffles-playercard-generator-download-button {
+    background: #1b5f9d;
+    background: linear-gradient(
+      163deg,
+      rgba(66, 165, 236, 1) 0%,
+      rgb(28, 95, 158) 77%
+    );
+    color: white;
+    padding: 8px;
+    border-radius: 8px;
+  }
+}

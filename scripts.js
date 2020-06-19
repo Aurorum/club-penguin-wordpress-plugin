@@ -1,157 +1,270 @@
-<!DOCTYPE html>
-<html>
-<head>
-<script type="text/javascript" src="items.json"></script>
-</head>
-<body>
-<button onclick="dog()">test</button>
-<p>Image to use:</p>
-<p id="output">test</p> 
-<div class="images">
-
-<img id="puffles-1-item-image" width="220" height="277" src="./assets/2.png">
-<img id="puffles-2-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-3-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-4-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-5-item-image" onerror="dog()" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-6-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-7-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-8-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-9-item-image" width="220" height="277" src="./assets/empty.png">
-<img id="puffles-10-item-image" width="220" height="277" src="./assets/empty.png">
-</div>
-<p>Canvas:</p>
-<div>
- <canvas id="puffles-canvas" width="600" height="600">
-Your browser does not support the HTML5 canvas tag.
-</canvas>
-<div>
-<select id="puffles-1-item" onchange="pufflesUpdateItem(1)" size="8">
-  </select>
-  <select id="puffles-2-item" onchange="pufflesUpdateItem(2)" size="8">
-  </select>
-    <select id="puffles-3-item" onchange="pufflesUpdateItem(3)" size="8">
-  </select>
-  <select id="puffles-4-item" onchange="pufflesUpdateItem(4)" size="8">
-  </select>
-  <select id="puffles-5-item" onchange="pufflesUpdateItem(5)" size="8">
-  </select>
-  <select id="puffles-6-item" onchange="pufflesUpdateItem(6)" size="8">
-  </select>
-  <select id="puffles-7-item" onchange="pufflesUpdateItem(7)" size="8">
-  </select>
-   <select id="puffles-8-item" onchange="pufflesUpdateItem(8)" size="8">
-  </select>
-  <select id="puffles-9-item" onchange="pufflesUpdateItem(9)" size="8">
-  </select>
-  </div>
-  </div>
-
-<script>
 var allPufflesBackItems = [];
 
-window.onload = function() {
-    buildCanvas();
-    pufflesBuildAllOptions();
-    var pufflesBackItems = pufflesFindBackItems();
-    var i;
-    
-    for (i = 0; i < pufflesBackItems.length; i++) {
-    	allPufflesBackItems.push(pufflesFindBackItems()[i].paper_item_id);
-    }
+window.onload = function () {
+  if (
+    document.getElementsByClassName("puffles-playercard-generator").length > 1
+  ) {
+    pufflesBlockMultipleGeneratorsOnSamePage();
+  }
+  pufflesConstructPlayercardCanvas();
+  pufflesBuildAllOptions();
+  var pufflesBackItems = pufflesFindBackItems();
+  var i;
+
+  for (i = 0; i < pufflesBackItems.length; i++) {
+    allPufflesBackItems.push(pufflesFindBackItems()[i].paper_item_id);
+  }
+
+  document.getElementById("puffles-playercard").classList.remove("is-loading");
+};
+
+function pufflesConstructPlayercardCanvas() {
+  var canvas = document.getElementById("puffles-canvas");
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // No loop here because layers must follow this specific order.
+
+  ctx.drawImage(document.getElementById("puffles-9-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-1-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-7-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-5-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-4-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-10-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-3-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-2-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-6-item-image"), 10, 10);
+  ctx.drawImage(document.getElementById("puffles-8-item-image"), 10, 10);
+
+  document.getElementById(
+    "puffles-playercard-download"
+  ).href = canvas.toDataURL("image/png");
 }
 
-function buildCanvas() {
-var canvas = document.getElementById("puffles-canvas");
-    var ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	// No loop here because layers must follow this specific order.
-
-     ctx.drawImage(document.getElementById("puffles-9-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-1-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-7-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-5-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-4-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-10-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-3-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-2-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-6-item-image"), 10, 10);
-     ctx.drawImage(document.getElementById("puffles-8-item-image"), 10, 10);
-  
-}
-
-function getCountryByCode(type) {
-    return data.filter(
-        function(data) {
-            return data.type == type && data.is_bait !== '1' && data.label.length
-        }
-    );
+function pufflesQueryPlayercardData(type) {
+  return pufflesItemsData.filter(function (pufflesItemsData) {
+    return pufflesItemsData.type == type && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length;
+  });
 }
 
 function pufflesFindBackItems() {
-    return data.filter(
-        function(data) {
-            return data.has_back === '1'
-        }
-    );
+  return pufflesItemsData.filter(function (pufflesItemsData) {
+    return pufflesItemsData.has_back === "1";
+  });
 }
 
 function pufflesBuildAllOptions() {
-    var i;
-    for (i = 0; i < 10; i++) {
-        pufflesBuildOptions(i);
-    }
+  var i;
+  for (i = 0; i < 10; i++) {
+    pufflesBuildOptions(i);
+  }
+  document.getElementById("puffles-1-item").value = "Aqua";
 }
-
 
 function pufflesBuildOptions(id) {
-    var found = getCountryByCode(id);
-    var i;
-    for (i = 0; i < found.length; i++) {
-        var pufflesSelectId = document.getElementById("puffles-" + id + "-item");
-        var option = document.createElement("option");
-        var item = found[i].label;
-        option.text = item;
-        pufflesSelectId.add(option);
+  var found = pufflesQueryPlayercardData(id);
+  var i;
+  for (i = 0; i < found.length; i++) {
+    var pufflesSelectId = document.getElementById("puffles-" + id + "-item");
+    var option = document.createElement("option");
+    var item = found[i].label;
+    option.text = item;
+    pufflesSelectId.add(option);
 
-        [].slice.call(pufflesSelectId.options)
-            .map(function(a) {
-                if (this[a.value]) {
-                    pufflesSelectId.removeChild(a);
-                } else {
-                    this[a.value] = 1;
-                }
-            }, {});
-    }
+    [].slice.call(pufflesSelectId.options).map(function (a) {
+      if (this[a.value]) {
+        pufflesSelectId.removeChild(a);
+      } else {
+        this[a.value] = 1;
+      }
+    }, {});
+  }
 }
 
-function getItemById(label, itemTypeId) {
-    return data.filter(
-        function(data) {
-            return data.label == label && data.type == itemTypeId 
+// TODO: Rewrite this - the amount of nested logic and repeated code gives me a headache.
+function pufflesSearchItem(addItem) {
+  var enteredInput = document.getElementById("puffles-item-search").value;
+
+  if (enteredInput === "") {
+    document.getElementById("puffles-item-search-result").innerHTML =
+      "Enter an item's name or ID above first.";
+  } else {
+    if (/^\d+$/.test(enteredInput)) {
+      var found = pufflesSearchById(enteredInput);
+      if (found.length) {
+        var category = pufflesGetCategoryByType(found[0].type);
+        document.getElementById("puffles-item-search-result").innerHTML =
+          "Found item <strong>" +
+          found[0].label +
+          "</strong> in the " +
+          "<strong>" +
+          category +
+          "</strong> category.";
+
+        if (addItem) {
+          document.getElementById("puffles-" + found[0].type + "-item").value =
+            found[0].label;
+          pufflesUpdateItem(found[0].type);
         }
-    );
+      } else {
+        document.getElementById("puffles-item-search-result").innerHTML =
+          "No item found";
+      }
+    } else {
+      var found = pufflesSearchByLabel(enteredInput);
+      if (found.length) {
+        var category = pufflesGetCategoryByType(found[0].type);
+        document.getElementById("puffles-item-search-result").innerHTML =
+          "Found item <strong>" +
+          found[0].label +
+          "</strong> in the " +
+          "<strong>" +
+          category +
+          "</strong> category.";
+
+        if (addItem) {
+          document.getElementById("puffles-" + found[0].type + "-item").value =
+            found[0].label;
+          pufflesUpdateItem(found[0].type);
+        }
+      } else {
+        document.getElementById("puffles-item-search-result").innerHTML =
+          "No item found";
+      }
+    }
+  }
 }
 
+function pufflesGenerateRandomPlayercard() {
+  var i;
+  for (i = 1; i < 10; i++) {
+    var found = pufflesQueryPlayercardData(i);
+    var randomNumber = Math.floor(Math.random() * found.length) + 1;
+    document.getElementById(
+      "puffles-" + found[randomNumber].type + "-item"
+    ).value = found[randomNumber].label;
+    pufflesUpdateItem(found[0].type);
+  }
+}
+
+function pufflesGetCategoryByType(itemTypeId) {
+  let category;
+  switch (itemTypeId) {
+    case 1:
+      category = "Colours";
+      break;
+    case 2:
+      category = "Head Items";
+      break;
+    case 3:
+      category = "Face Items";
+      break;
+    case 4:
+      category = "Neck Items";
+      break;
+    case 5:
+      category = "Body Items";
+      break;
+    case 6:
+      category = "Hand Items";
+      break;
+    case 7:
+      category = "Feet Items";
+      break;
+    case 8:
+      category = "Pins";
+      break;
+    case 9:
+      category = "Backgrounds";
+      break;
+    default:
+      category = "N/A";
+      break;
+  }
+
+  return category;
+}
+
+function pufflesBlockMultipleGeneratorsOnSamePage() {
+  var i;
+  for (
+    i = 1;
+    i < document.getElementsByClassName("puffles-playercard-generator").length;
+    i++
+  ) {
+    document.getElementsByClassName("puffles-playercard-generator")[
+      i
+    ].innerHTML =
+      "<p>Please click <a onclick='pufflesScrollToPlayercard()'>here</a> to use the playercard generator.</p>";
+    document
+      .getElementsByClassName("puffles-playercard-generator")
+      [i].classList.remove("is-loading");
+  }
+}
+
+function pufflesScrollToPlayercard() {
+  document.getElementById("puffles-playercard").scrollIntoView();
+}
+
+function pufflesDoesFileExist(url) {
+  var http = new XMLHttpRequest();
+  http.open("HEAD", url, false);
+  http.send();
+  return http.status !== 404;
+}
+
+function pufflesGetItemById(label, itemTypeId) {
+  return pufflesItemsData.filter(function (pufflesItemsData) {
+    return pufflesItemsData.label == label && pufflesItemsData.type == itemTypeId;
+  });
+}
+
+function pufflesSearchById(itemId) {
+  return pufflesItemsData.filter(function (pufflesItemsData) {
+    return (
+      pufflesItemsData.paper_item_id == itemId && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length
+    );
+  });
+}
+
+function pufflesSearchByLabel(label) {
+  return pufflesItemsData.filter(function (pufflesItemsData) {
+    return pufflesItemsData.label == label && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length;
+  });
+}
 
 function pufflesUpdateItem(itemTypeId) {
-    let selectId;
+  let selectId;
 
-    var sel = document.getElementById("puffles-" + itemTypeId + "-item");
-    var found = getItemById(sel.options[sel.selectedIndex].text, itemTypeId);
-    document.getElementById("puffles-" + itemTypeId + "-item-image").src = './assets/' + found[0].paper_item_id + '.png';
-    
-    if ( allPufflesBackItems.includes(found[0].paper_item_id) ) {
-    document.getElementById("puffles-10-item-image").src = './assets/' + found[0].paper_item_id + '_back.png';
+  var sel = document.getElementById("puffles-" + itemTypeId + "-item");
+  var found = pufflesGetItemById(
+    sel.options[sel.selectedIndex].text,
+    itemTypeId
+  );
+  if (
+    pufflesDoesFileExist(
+      pufflesPlayercardItems.directory + found[0].paper_item_id + ".png"
+    )
+  ) {
+    document.getElementById("puffles-" + itemTypeId + "-item-image").src =
+      pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
+    document.getElementById("puffles-item-search-error").style.display = "none";
+    if (allPufflesBackItems.includes(found[0].paper_item_id)) {
+      document.getElementById("puffles-10-item-image").src =
+        pufflesPlayercardItems.directory + found[0].paper_item_id + "_back.png";
     } else {
-    document.getElementById("puffles-10-item-image").src = './assets/empty.png';
+      document.getElementById("puffles-10-item-image").src =
+        pufflesPlayercardItems.directory + "empty.png";
     }
+  } else {
+    document.getElementById("puffles-10-item-image").src =
+      pufflesPlayercardItems.directory + "empty.png";
+    document.getElementById("puffles-item-search-error").innerHTML =
+      "Sorry! No files are stored for <strong>" + found[0].label + "</strong>.";
+    document.getElementById("puffles-item-search-error").style.display =
+      "block";
+  }
 
-    console.log('./assets/' + found[0].paper_item_id + '.png');
- console.log(document.getElementById("puffles-" + itemTypeId + "-item-image").src);
- setTimeout(buildCanvas, 100);
+  setTimeout(pufflesConstructPlayercardCanvas, 200);
+  setTimeout(pufflesConstructPlayercardCanvas, 300);
+  setTimeout(pufflesConstructPlayercardCanvas, 500);
 }
-</script>
-
-</body>
-</html>
