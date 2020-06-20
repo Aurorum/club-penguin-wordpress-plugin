@@ -12,7 +12,7 @@ window.onload = function () {
   var i;
 
   for (i = 0; i < pufflesBackItems.length; i++) {
-    allPufflesBackItems.push(pufflesFindBackItems()[i].paper_item_id);
+    allPufflesBackItems.push(pufflesBackItems[i].paper_item_id);
   }
   pufflesRememberItems();
   document.getElementById("puffles-playercard").classList.remove("is-loading");
@@ -94,20 +94,20 @@ function pufflesSearchItem(addItem) {
   } else {
     if (/^\d+$/.test(enteredInput)) {
       var found = pufflesSearchById(enteredInput);
-      if (found.length) {
-        var category = pufflesGetCategoryByType(found[0].type);
+      if (found) {
+        var category = pufflesGetCategoryByType(found.type);
         document.getElementById("puffles-item-search-result").innerHTML =
           "Found item <strong>" +
-          found[0].label +
+          found.label +
           "</strong> in the " +
           "<strong>" +
           category +
           "</strong> category.";
 
         if (addItem) {
-          document.getElementById("puffles-" + found[0].type + "-item").value =
-            found[0].label;
-          pufflesUpdateItem(found[0].type);
+          document.getElementById("puffles-" + found.type + "-item").value =
+            found.label;
+          pufflesUpdateItem(found.type);
         }
       } else {
         document.getElementById("puffles-item-search-result").innerHTML =
@@ -115,20 +115,20 @@ function pufflesSearchItem(addItem) {
       }
     } else {
       var found = pufflesSearchByLabel(enteredInput);
-      if (found.length) {
-        var category = pufflesGetCategoryByType(found[0].type);
+      if (found) {
+        var category = pufflesGetCategoryByType(found.type);
         document.getElementById("puffles-item-search-result").innerHTML =
           "Found item <strong>" +
-          found[0].label +
+          found.label +
           "</strong> in the " +
           "<strong>" +
           category +
           "</strong> category.";
 
         if (addItem) {
-          document.getElementById("puffles-" + found[0].type + "-item").value =
-            found[0].label;
-          pufflesUpdateItem(found[0].type);
+          document.getElementById("puffles-" + found.type + "-item").value =
+            found.label;
+          pufflesUpdateItem(found.type);
         }
       } else {
         document.getElementById("puffles-item-search-result").innerHTML =
@@ -241,11 +241,15 @@ function pufflesScrollToPlayercard() {
   document.getElementById("puffles-playercard").scrollIntoView();
 }
 
-function pufflesDoesFileExist(url) {
+function pufflesDoesFileExist(url, callback) {
   var http = new XMLHttpRequest();
+  http.onreadystatechange = function() {
+	if(http.readyState == 4) {
+		callback(http.status != 404);
+	}
+  }
   http.open("HEAD", url, false);
   http.send();
-  return http.status !== 404;
 }
 
 function pufflesGetItemById(label, itemTypeId) {
@@ -257,21 +261,19 @@ function pufflesGetItemById(label, itemTypeId) {
 }
 
 function pufflesSearchById(itemId) {
-  return pufflesItemsData.filter(function (pufflesItemsData) {
+  return pufflesItemsData.find(function (pufflesItemsData) {
     return (
       pufflesItemsData.paper_item_id == itemId &&
-      pufflesItemsData.is_bait !== "1" &&
-      pufflesItemsData.label.length
+      pufflesItemsData.is_bait !== "1"
     );
   });
 }
 
 function pufflesSearchByLabel(label) {
-  return pufflesItemsData.filter(function (pufflesItemsData) {
+  return pufflesItemsData.find(function (pufflesItemsData) {
     return (
-      pufflesItemsData.label == label &&
-      pufflesItemsData.is_bait !== "1" &&
-      pufflesItemsData.label.length
+      pufflesItemsData.label.toLowerCase() == label.toLowerCase() &&
+      pufflesItemsData.is_bait !== "1"
     );
   });
 }
@@ -284,37 +286,35 @@ function pufflesUpdateItem(itemTypeId) {
     sel.options[sel.selectedIndex].text,
     itemTypeId
   );
-  if (
-    pufflesDoesFileExist(
-      pufflesPlayercardItems.directory + found[0].paper_item_id + ".png"
-    )
-  ) {
-    document.getElementById("puffles-" + itemTypeId + "-item-image").src =
-      pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
-    document.getElementById("puffles-item-search-error").style.display = "none";
+    pufflesDoesFileExist(pufflesPlayercardItems.directory + found[0].paper_item_id + ".png", function(exists) {
+      if(exists) {
+		document.getElementById("puffles-" + itemTypeId + "-item-image").src = 
+		  pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
+        document.getElementById("puffles-item-search-error").style.display = "none";
 
-    if (typeof Storage !== "undefined") {
-      localStorage.setItem(
-        "puffles-playercard-generator-" + itemTypeId,
-        found[0].paper_item_id
-      );
-    }
+        if (typeof Storage !== "undefined") {
+          localStorage.setItem(
+            "puffles-playercard-generator-" + itemTypeId,
+            found[0].paper_item_id
+          );
+        }
 
-    if (allPufflesBackItems.includes(found[0].paper_item_id)) {
-      document.getElementById("puffles-10-item-image").src =
-        pufflesPlayercardItems.directory + found[0].paper_item_id + "_back.png";
-    } else {
-      document.getElementById("puffles-10-item-image").src =
-        pufflesPlayercardItems.directory + "empty.png";
-    }
-  } else {
-    document.getElementById("puffles-10-item-image").src =
-      pufflesPlayercardItems.directory + "empty.png";
-    document.getElementById("puffles-item-search-error").innerHTML =
-      "Sorry! No files are stored for <strong>" + found[0].label + "</strong>.";
-    document.getElementById("puffles-item-search-error").style.display =
-      "block";
-  }
-
-  setInterval(pufflesConstructPlayercardCanvas, 300);
+        if (allPufflesBackItems.includes(found[0].paper_item_id)) {
+          document.getElementById("puffles-10-item-image").src =
+            pufflesPlayercardItems.directory + found[0].paper_item_id + "_back.png";
+        } else {
+          document.getElementById("puffles-10-item-image").src =
+            pufflesPlayercardItems.directory + "empty.png";
+        }
+	  }
+	 else {
+       document.getElementById("puffles-10-item-image").src =
+         pufflesPlayercardItems.directory + "empty.png";
+       document.getElementById("puffles-item-search-error").innerHTML =
+         "Sorry! No files are stored for <strong>" + found[0].label + "</strong>.";
+       document.getElementById("puffles-item-search-error").style.display =
+         "block";
+	 }
+	 setInterval(pufflesConstructPlayercardCanvas, 300);
+	});
 }
