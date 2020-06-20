@@ -1,30 +1,39 @@
 .puffles-playercard-generator {
   align-items: center;
   display: flex;
+  margin: auto;
+  margin-bottom: 20px;
 }
 
 .puffles-playercard-generator.is-loading {
   background: #e8e5e5;
-  height: 425px;
+  justify-content: center;
+  width: calc(100% - 24px);
 }
 
 .puffles-playercard-generator.is-loading * {
-  display: none;
+  visibility: hidden;
 }
 
 .puffles-playercard-generator-loading-placeholder {
   display: none;
 }
 
-.puffles-playercard-generator.is-loading
-  .puffles-playercard-generator-loading-placeholder {
+.puffles-playercard-generator-loading-placeholder {
+  -webkit-animation: pufflesLoadingAnimation infinite 8s;
   animation: pufflesLoadingAnimation infinite 8s;
   background: #b3acac;
-  display: block;
   margin: auto;
+  position: absolute;
   padding: 12px;
   height: 36px;
   width: 36px;
+}
+
+.puffles-playercard-generator.is-loading
+  .puffles-playercard-generator-loading-placeholder {
+  display: block;
+  visibility: visible;
 }
 
 @keyframes pufflesLoadingAnimation {
@@ -53,7 +62,6 @@
 }
 
 .puffles-playercard-canvas {
-  margin-right: 12px;
   width: 320px;
 }
 
@@ -62,8 +70,12 @@
   margin-top: 24px;
 }
 
-.puffles-playercard-random {
+.puffles-playercard-action {
   cursor: pointer;
+}
+
+.puffles-playercard-action.clear-action {
+	float: right;
 }
 
 .puffles-playercard-generator-items select {

@@ -14,7 +14,7 @@ window.onload = function () {
   for (i = 0; i < pufflesBackItems.length; i++) {
     allPufflesBackItems.push(pufflesFindBackItems()[i].paper_item_id);
   }
-
+  pufflesRememberItems();
   document.getElementById("puffles-playercard").classList.remove("is-loading");
 };
 
@@ -42,7 +42,11 @@ function pufflesConstructPlayercardCanvas() {
 
 function pufflesQueryPlayercardData(type) {
   return pufflesItemsData.filter(function (pufflesItemsData) {
-    return pufflesItemsData.type == type && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length;
+    return (
+      pufflesItemsData.type == type &&
+      pufflesItemsData.is_bait !== "1" &&
+      pufflesItemsData.label.length
+    );
   });
 }
 
@@ -184,6 +188,38 @@ function pufflesGetCategoryByType(itemTypeId) {
   return category;
 }
 
+function pufflesRememberItems() {
+  if (typeof Storage !== "undefined") {
+    var i;
+    for (i = 1; i < 10; i++) {
+      var itemId = localStorage.getItem("puffles-playercard-generator-" + i);
+      if (itemId) {
+        document.getElementById(
+          "puffles-" + i + "-item"
+        ).value = pufflesSearchById(itemId)[0].label;
+        pufflesUpdateItem(i);
+      }
+    }
+  }
+}
+
+function pufflesClearPlayercard() {
+  var i;
+  for (i = 2; i < 10; i++) {
+    document.getElementById("puffles-" + i + "-item").selectedIndex = -1;
+    if (typeof Storage !== "undefined") {
+      localStorage.removeItem("puffles-playercard-generator-" + i);
+    }
+    document.getElementById("puffles-" + i + "-item-image").src =
+      pufflesPlayercardItems.directory + "empty.png";
+  }
+
+  setTimeout(pufflesConstructPlayercardCanvas, 200);
+  setTimeout(pufflesConstructPlayercardCanvas, 300);
+  setTimeout(pufflesConstructPlayercardCanvas, 500);
+  setTimeout(pufflesConstructPlayercardCanvas, 1000);
+}
+
 function pufflesBlockMultipleGeneratorsOnSamePage() {
   var i;
   for (
@@ -214,21 +250,29 @@ function pufflesDoesFileExist(url) {
 
 function pufflesGetItemById(label, itemTypeId) {
   return pufflesItemsData.filter(function (pufflesItemsData) {
-    return pufflesItemsData.label == label && pufflesItemsData.type == itemTypeId;
+    return (
+      pufflesItemsData.label == label && pufflesItemsData.type == itemTypeId
+    );
   });
 }
 
 function pufflesSearchById(itemId) {
   return pufflesItemsData.filter(function (pufflesItemsData) {
     return (
-      pufflesItemsData.paper_item_id == itemId && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length
+      pufflesItemsData.paper_item_id == itemId &&
+      pufflesItemsData.is_bait !== "1" &&
+      pufflesItemsData.label.length
     );
   });
 }
 
 function pufflesSearchByLabel(label) {
   return pufflesItemsData.filter(function (pufflesItemsData) {
-    return pufflesItemsData.label == label && pufflesItemsData.is_bait !== "1" && pufflesItemsData.label.length;
+    return (
+      pufflesItemsData.label == label &&
+      pufflesItemsData.is_bait !== "1" &&
+      pufflesItemsData.label.length
+    );
   });
 }
 
@@ -248,6 +292,14 @@ function pufflesUpdateItem(itemTypeId) {
     document.getElementById("puffles-" + itemTypeId + "-item-image").src =
       pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
     document.getElementById("puffles-item-search-error").style.display = "none";
+
+    if (typeof Storage !== "undefined") {
+      localStorage.setItem(
+        "puffles-playercard-generator-" + itemTypeId,
+        found[0].paper_item_id
+      );
+    }
+
     if (allPufflesBackItems.includes(found[0].paper_item_id)) {
       document.getElementById("puffles-10-item-image").src =
         pufflesPlayercardItems.directory + found[0].paper_item_id + "_back.png";
@@ -264,7 +316,5 @@ function pufflesUpdateItem(itemTypeId) {
       "block";
   }
 
-  setTimeout(pufflesConstructPlayercardCanvas, 200);
-  setTimeout(pufflesConstructPlayercardCanvas, 300);
-  setTimeout(pufflesConstructPlayercardCanvas, 500);
+  setInterval(pufflesConstructPlayercardCanvas, 300);
 }

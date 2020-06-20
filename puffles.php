@@ -22,7 +22,13 @@ function pufflesPlayercardGeneratorShortcode($content = null)
     $data = array(
         'directory' => plugins_url('/assets/', __FILE__)
     );
-    
+
+	// This ensures compatibility with Automattic's "Page Optimize" plugin.
+	// Update the page ID to suit your own site if that plugin is enabled!
+	if ( get_option( 'page_optimize-js', true ) && get_the_ID() === 31388 ) {
+		add_filter( 'js_do_concat', '__return_false' );
+	}
+
     wp_register_script('puffles_scripts', plugin_dir_url(__FILE__) . 'scripts.js', '', '', true);
     wp_localize_script('puffles_scripts', 'pufflesPlayercardItems', $data);
     wp_enqueue_script('puffles_scripts');
@@ -59,7 +65,8 @@ function pufflesPlayercardGeneratorShortcode($content = null)
       <canvas id="puffles-canvas" class="puffles-playercard-canvas" width="600" height="600">
          Your browser does not support this generator - sorry!
       </canvas>
-      <a onclick="pufflesGenerateRandomPlayercard()" class="puffles-playercard-random">Generate random playercard</a>
+      <a onclick="pufflesGenerateRandomPlayercard()" class="puffles-playercard-action">Generate random playercard</a>
+      <a onclick="pufflesClearPlayercard()" class="puffles-playercard-action clear-action">Clear</a>
    </div>
    <div class="puffles-playercard-generator-items">
       <select id="puffles-1-item" onchange="pufflesUpdateItem(1)" size="4">
