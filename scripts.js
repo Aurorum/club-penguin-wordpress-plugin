@@ -196,7 +196,7 @@ function pufflesRememberItems() {
       if (itemId) {
         document.getElementById(
           "puffles-" + i + "-item"
-        ).value = pufflesSearchById(itemId)[0].label;
+        ).value = pufflesSearchById(itemId).label;
         pufflesUpdateItem(i);
       }
     }
