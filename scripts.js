@@ -193,7 +193,7 @@ function pufflesRememberItems() {
     var i;
     for (i = 1; i < 10; i++) {
       var itemId = localStorage.getItem("puffles-playercard-generator-" + i);
-      if (itemId) {
+      if (itemId && !!pufflesSearchById(itemId)) {
         document.getElementById(
           "puffles-" + i + "-item"
         ).value = pufflesSearchById(itemId).label;
@@ -243,11 +243,11 @@ function pufflesScrollToPlayercard() {
 
 function pufflesDoesFileExist(url, callback) {
   var http = new XMLHttpRequest();
-  http.onreadystatechange = function() {
-	if(http.readyState == 4) {
-		callback(http.status != 404);
-	}
-  }
+  http.onreadystatechange = function () {
+    if (http.readyState == 4) {
+      callback(http.status != 404);
+    }
+  };
   http.open("HEAD", url, false);
   http.send();
 }
@@ -286,11 +286,14 @@ function pufflesUpdateItem(itemTypeId) {
     sel.options[sel.selectedIndex].text,
     itemTypeId
   );
-    pufflesDoesFileExist(pufflesPlayercardItems.directory + found[0].paper_item_id + ".png", function(exists) {
-      if(exists) {
-		document.getElementById("puffles-" + itemTypeId + "-item-image").src = 
-		  pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
-        document.getElementById("puffles-item-search-error").style.display = "none";
+  pufflesDoesFileExist(
+    pufflesPlayercardItems.directory + found[0].paper_item_id + ".png",
+    function (exists) {
+      if (exists) {
+        document.getElementById("puffles-" + itemTypeId + "-item-image").src =
+          pufflesPlayercardItems.directory + found[0].paper_item_id + ".png";
+        document.getElementById("puffles-item-search-error").style.display =
+          "none";
 
         if (typeof Storage !== "undefined") {
           localStorage.setItem(
@@ -301,20 +304,24 @@ function pufflesUpdateItem(itemTypeId) {
 
         if (allPufflesBackItems.includes(found[0].paper_item_id)) {
           document.getElementById("puffles-10-item-image").src =
-            pufflesPlayercardItems.directory + found[0].paper_item_id + "_back.png";
+            pufflesPlayercardItems.directory +
+            found[0].paper_item_id +
+            "_back.png";
         } else {
           document.getElementById("puffles-10-item-image").src =
             pufflesPlayercardItems.directory + "empty.png";
         }
-	  }
-	 else {
-       document.getElementById("puffles-10-item-image").src =
-         pufflesPlayercardItems.directory + "empty.png";
-       document.getElementById("puffles-item-search-error").innerHTML =
-         "Sorry! No files are stored for <strong>" + found[0].label + "</strong>.";
-       document.getElementById("puffles-item-search-error").style.display =
-         "block";
-	 }
-	 setInterval(pufflesConstructPlayercardCanvas, 300);
-	});
+      } else {
+        document.getElementById("puffles-10-item-image").src =
+          pufflesPlayercardItems.directory + "empty.png";
+        document.getElementById("puffles-item-search-error").innerHTML =
+          "Sorry! No files are stored for <strong>" +
+          found[0].label +
+          "</strong>.";
+        document.getElementById("puffles-item-search-error").style.display =
+          "block";
+      }
+      setInterval(pufflesConstructPlayercardCanvas, 300);
+    }
+  );
 }
