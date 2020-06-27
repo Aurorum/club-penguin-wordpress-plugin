@@ -10,7 +10,7 @@
  * Plugin Name:       Puffles - for Club Penguin Bloggers
  * Plugin URI:        https://github.com/Aurorum/club-penguin-wordpress-plugin
  * Description:       Currently offers a playercard generator based on Club Penguin's assets.
- * Version:           1.0.0
+ * Version:           1.1
  * Author:            Aurorum
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -29,12 +29,12 @@ function pufflesPlayercardGeneratorShortcode($content = null)
 		add_filter( 'js_do_concat', '__return_false' );
 	}
 
+    wp_register_script('puffles-items', plugin_dir_url(__FILE__) . 'items.js', '', '', true);
+    wp_enqueue_script('puffles-items');
+
     wp_register_script('puffles_scripts', plugin_dir_url(__FILE__) . 'scripts.js', '', '', true);
     wp_localize_script('puffles_scripts', 'pufflesPlayercardItems', $data);
     wp_enqueue_script('puffles_scripts');
-    
-    wp_register_script('puffles-items', plugin_dir_url(__FILE__) . 'items.json', '', '', true);
-    wp_enqueue_script('puffles-items');
     
     $pufflesEmptyFile = plugins_url('assets/empty.png', __FILE__);
     
